@@ -1,16 +1,20 @@
-const express = require('express');
-const jwt = require("jsonwebtoken");
-
+const express = require("express");
 const app = express();
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+const dataQuery = require("./config/database");
+dotenv.config();
 
-app.get('/api', (req,res) => {
+app.get("/api", (req, res) => {
     res.json({
-        message:"Welcome to the api"
-    })
-})
+        message: `hello welcome to the website running in ${process.env.PORT}`,
+    });
+});
 
-app.get('/api/posts', (req,res) =>{
-    res.send("hello")
-})
+app.post("/api/posts", (req, res) => {
+    res.post("hello");
+});
 
-app.listen(5000, () => console.log("Running on port 5000"));
+app.listen(process.env.PORT, () =>
+    console.log(`Running on port ${process.env.PORT}`)
+);
