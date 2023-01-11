@@ -1,3 +1,6 @@
+const Sequelize = require("sequelize");
+const database = require("./database");
+
 const EcommerceModel = sequelize.define("ecommerce", {
     id: {
         type: Sequelize.INTEGER,
@@ -16,3 +19,5 @@ const EcommerceModel = sequelize.define("ecommerce", {
         allowNull: false,
     },
 });
+
+module.exports = EcommerceModel;
