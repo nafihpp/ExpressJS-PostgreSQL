@@ -21,4 +21,5 @@ database
         console.error("Unable to connect to the database:", err);
     });
 
+    database.sync();
 module.exports = database;
