@@ -4,28 +4,25 @@ const sequelize = require("../config/database");
 const User = sequelize.define("User", {
     id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
         autoIncrement: true,
         primaryKey: true,
     },
     username: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     password: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW,
     },
-    updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-    },
 });
+
+// Create the "users" table if it doesn't exist
+User.sync();
 
 module.exports = User;

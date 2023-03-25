@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-const routes = require("./controllers/users");
+const routes = require("./controllers/usersController");
 dotenv.config();
 
 app.use("/", routes);

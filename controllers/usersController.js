@@ -1,6 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const Model = require("../model/users");
+const authMiddleware = require("../middlewares/authMiddleware");
+
+router.get("/api/protected", authMiddleware, (req, res) => {
+    // This route is protected by the authMiddleware. If the token is valid, the user's information will be available on the req.user object.
+    res.json({ message: "Hello, " + req.user.username });
+});
 
 // GET all resources
 router.get("/", async (req, res) => {
