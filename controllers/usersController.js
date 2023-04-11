@@ -2,81 +2,83 @@ const express = require("express");
 const router = express.Router();
 const Model = require("../model/users");
 const authMiddleware = require("../middlewares/authMiddleware");
+const jwt = require("jsonwebtoken");
+const secret = "your-secret-key";
+const bcrypt = require("bcryptjs");
 
-router.get("/api/protected", authMiddleware, (req, res) => {
-    // This route is protected by the authMiddleware. If the token is valid, the user's information will be available on the req.user object.
-    res.json({ message: "Hello, " + req.user.username });
-});
-
-// GET all resources
-router.get("/", async (req, res) => {
+router.post("/signup", async (req, res) => {
     try {
-        const items = await Model.findAll();
-        res.status(200).json(items);
-    } catch (error) {
-        res.status(500).json({ error: "Internal server error" });
-    }
-});
-
-// GET a specific resource by ID
-router.get("/:id", async (req, res) => {
-    try {
-        const item = await Model.findByPk(req.params.id);
-        if (!item) {
-            res.status(404).json({ error: "Item not found" });
-        } else {
-            res.status(200).json(item);
+        const username = req.body.username;
+        const password = req.body.password;
+        if (!username || !password) {
+            return res
+                .status(400)
+                .json({ error: "Please enter a username and password" });
         }
-    } catch (error) {
-        res.status(500).json({ error: "Internal server error" });
-    }
-});
-
-// POST a new resource
-router.post("/", async (req, res) => {
-    try {
-        const item = await Model.create(req.body);
-        res.status(201).json(item);
-    } catch (error) {
-        if (error.name === "SequelizeValidationError") {
-            res.status(400).json({ error: error.message });
-        } else {
-            res.status(500).json({ error: "Internal server error" });
+        const checkUsername = await Model.findByUsername(username);
+        if (checkUsername) {
+            return res.status(400).json({ error: "Username already exists" });
         }
-    }
-});
-
-// PUT (update) a specific resource by ID
-router.put("/:id", async (req, res) => {
-    try {
-        const result = await Model.update(req.body, {
-            where: { id: req.params.id },
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const item = await Model.create({
+            username: username,
+            password: hashedPassword,
         });
-        if (result[0] === 0) {
-            res.status(404).json({ error: "Item not found" });
-        } else {
-            res.status(200).json({ message: "Item updated successfully" });
+        const user = await Model.findByUsername(username);
+        const passwordMatches = await bcrypt.compare(password, user.password);
+        if (!passwordMatches) {
+            return res.status(401).send("Password is incorrect");
+        } else if (passwordMatches) {
+            const token = jwt.sign({ id: user.id }, secret, {
+                expiresIn: "1h",
+            });
+            return res.status(201).json({
+                status: "Successfully registered",
+                data: item,
+                token,
+            });
         }
     } catch (error) {
-        if (error.name === "SequelizeValidationError") {
-            res.status(400).json({ error: error.message });
-        } else {
-            res.status(500).json({ error: "Internal server error" });
-        }
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
     }
 });
 
-// DELETE a specific resource by ID
-router.delete("/:id", async (req, res) => {
+router.post("/login", async (req, res) => {
     try {
-        const result = await Model.destroy({ where: { id: req.params.id } });
-        if (result === 0) {
-            res.status(404).json({ error: "Item not found" });
-        } else {
-            res.status(200).json({ message: "Item deleted successfully" });
+        const username = req.body.username;
+        const password = req.body.password;
+        if (!username) {
+            return res.status(400).send("Username is required");
+        }
+        const user = await Model.findByUsername(username);
+        if (!user) {
+            return res.status(404).send("User does not exist");
+        }
+        const passwordMatches = await bcrypt.compare(password, user.password);
+        if (!passwordMatches) {
+            return res.status(401).send("Password is incorrect");
+        } else if (passwordMatches) {
+            const token = jwt.sign({ id: user.id }, secret, {
+                expiresIn: "1h",
+            });
+            res.json({ token: token });
         }
     } catch (error) {
-        res.status(500).json({ error: "Internal server error" });
+        console.error(error);
+        res.status(500).send("Internal server error: " + error.message);
+    }
+});
+
+router.get("/api/protected", authMiddleware, async (req, res) => {
+    try {
+        const username = req.user;
+        const getId = await Model.findByPk(username.id);
+        return res.status(200).json({ data: getId });
+    } catch (error) {
+        return res
+            .status(500)
+            .json({ error: "Internal server error" + error.message });
     }
 });
 

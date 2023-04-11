@@ -1,5 +1,8 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
+const Order = require("./Order");
+const address = require("./address");
+const { profile } = require("console");
 
 const User = sequelize.define("User", {
     id: {
@@ -9,20 +12,23 @@ const User = sequelize.define("User", {
     },
     username: {
         type: DataTypes.STRING,
-        allowNull: true,
     },
     password: {
         type: DataTypes.STRING,
-        allowNull: true,
-    },
-    createdAt: {
-        type: DataTypes.DATE,
         allowNull: false,
-        defaultValue: DataTypes.NOW,
     },
 });
 
 // Create the "users" table if it doesn't exist
 User.sync();
+
+User.findByUsername = async function (username) {
+    const user = await this.findOne({ where: { username } });
+    return user;
+};
+
+// User.hasMany(Order, { foreignKey: "userId" });
+// User.hasMany(address, { foreignKey: "addressId" });
+// User.hasOne(profile, { foreignKey: "profileId" });
 
 module.exports = User;
