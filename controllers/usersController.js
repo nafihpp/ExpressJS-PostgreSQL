@@ -1,6 +1,6 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const Model = require("../model/users");
+// const Model = require("../model/users");
 const authMiddleware = require("../middlewares/authMiddleware");
 const jwt = require("jsonwebtoken");
 const secret = "your-secret-key";
@@ -73,8 +73,8 @@ router.post("/login", async (req, res) => {
 router.get("/api/protected", authMiddleware, async (req, res) => {
     try {
         const username = req.user;
-        const getId = await Model.findByPk(username.id);
-        return res.status(200).json({ data: getId });
+        const getCurrentDetails = await Model.findByPk(username.id);
+        return res.status(200).json({ data: getCurrentDetails });
     } catch (error) {
         return res
             .status(500)

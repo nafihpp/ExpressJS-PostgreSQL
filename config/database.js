@@ -1,17 +1,13 @@
-const { Sequelize } = require("sequelize");
+// Define the database connection options
+const dbConfig = {
+    type: "postgres",
+    host: "localhost",
+    port: 5432,
+    username: "postgres",
+    password: "Nafihpp@123",
+    database: "postgresql",
+    entities: [__dirname + "/models/*.js"],
+    synchronize: true,
+};
 
-const sequelize = new Sequelize({
-    database: "postgresql", // specify the database name
-    username: "postgres", // specify the username of the database
-    password: "Nafihpp@123", // specify the password of the database
-    host: "localhost", // specify the host where the database is located
-    dialect: "postgres", // specify the dialect of the database management system
-});
-sequelize
-    .authenticate()
-    .then(() => {
-        console.log("Connection has been established successfully.");
-    })
-    .catch((error) => console.log("Error connecting database", error));
-
-module.exports = sequelize;
+module.exports = dbConfig;
