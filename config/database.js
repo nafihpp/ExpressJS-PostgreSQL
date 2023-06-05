@@ -4,7 +4,7 @@ const dbConfig = {
     host: "localhost",
     port: 5432,
     username: "postgres",
-    password: "Nafihpp@123",
+    password: "",
     database: "postgresql",
     entities: [__dirname + "/models/*.js"],
     synchronize: true,
