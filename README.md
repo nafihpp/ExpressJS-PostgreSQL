@@ -1,9 +1,9 @@
-# Ecommerce-backend-ExpressJS-PostgreSQL
+# ExpressJS-PostgreSQL
 
 Express JS - Backend Framework
 
 PostgreSQL - Database
 
-Sequalize - ORM
+Sequalize - TypeORM
 
 JWT - Authentication 
